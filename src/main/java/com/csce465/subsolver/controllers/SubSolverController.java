@@ -1,14 +1,17 @@
 package com.csce465.subsolver.controllers;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import java.util.Map;
 
-@RestController
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
 public class SubSolverController {
 	
 	@RequestMapping("/")
-	public String test() {
-		return "Hello SubSolver!";
+	public String home(Map<String, Object> model) {
+		model.put("message", "Welcome Screen!");
+		return "home";
 	}
 	
 }
