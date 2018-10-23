@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class SubSolverController {
 	
-	@RequestMapping("/")
+	@RequestMapping("/home")
 	public String home(Map<String, Object> model) {
 		model.put("message", "Welcome Screen!");
 		return "home";
