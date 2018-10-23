@@ -1,0 +1,5 @@
+applications:
+- name: SubSolver
+  random-route: true
+  path: target/subsolver.war
+  instances: 1
