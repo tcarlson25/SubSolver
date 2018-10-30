@@ -24,7 +24,7 @@ body {
 
 textarea {
     width: 100%; /* Full width */
-    padding: 12px; /* Some padding */  
+    padding: 12px; /* Some padding */
     border: 1px solid #ccc; /* Gray border */
     border-radius: 4px; /* Rounded borders */
     box-sizing: border-box; /* Make sure that padding and width stays in place */
@@ -34,7 +34,7 @@ textarea {
 }
 
 /* Style the submit button with a specific background color etc */
-input[type=submit] {
+#decryptButton {
     background-color: #4CAF50;
     color: white;
     padding: 12px 20px;
@@ -44,7 +44,7 @@ input[type=submit] {
 }
 
 /* When moving the mouse over the submit button, add a darker green color */
-input[type=submit]:hover {
+#decryptButton:hover {
     background-color: #45a049;
 }
 
@@ -53,7 +53,7 @@ input[type=submit]:hover {
     border-radius: 5px;
     background-color: #313E50;
     padding: 20px;
-    
+
     position: relative;
   	margin-top: 50px;
 }
