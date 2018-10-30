@@ -1,1 +1,1 @@
-web: gunicorn subsolver.wsgi:app --log-file -
+web: gunicorn SubSolver.wsgi:application --log-file -
