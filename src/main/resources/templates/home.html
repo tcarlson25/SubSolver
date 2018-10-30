@@ -14,9 +14,9 @@
 			</h1>
 		</div>
 		<div class="container">
-			<form action="#" id="decryptForm">
+			<form action="#" th:action="@{/home}" th:object="${ciphertext}" method="post" id="decryptForm" >
 				<label id="cipherLabel" for="ciphertext-input">Ciphertext</label>
-				<textarea id="ciphertext-input" rows="15" cols="100" name="ciphertext-input" placeholder="Enter Ciphertext to Decrypt..."></textarea>
+				<textarea id="ciphertext-input" rows="15" cols="100" th:field="*{content}" placeholder="Enter Ciphertext to Decrypt..."></textarea>
 				<br/>
 				<input type="submit" value="Decrypt"></input>
 			</form>
