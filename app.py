@@ -17,15 +17,12 @@ def decrypt():
     if methodOption == "1":
         solver = NgramSolver(ciphertextInput, 4)
         key, plaintext = solver.solve()
-        print('here1')
         return json.dumps({'status':'OK', 'key': key, 'plaintext': plaintext})
     elif methodOption == "2":
         solver = None
-        print('here2')
         return json.dumps({'status':'Fail'})
     else:
         solver = None
-        print('here3')
         return json.dumps({'status':'Fail'})
 
 if __name__ == "__main__":
