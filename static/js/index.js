@@ -15,6 +15,9 @@ $(document).ready(function() {
   		type: 'POST',
   		success: function(response){
   			console.log(response);
+        responseJson = JSON.parse(response);
+        $("#possibleKey").text(responseJson.key);
+        $("#plaintextResult").text(responseJson.plaintext);
         $('#loader').hide();
   		},
   		error: function(error){
