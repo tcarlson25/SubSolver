@@ -24,11 +24,13 @@ body {
 
 #method1Label {
   color: #fff;
+  font-size: 10pt;
 }
 
 #method2Label {
   padding-left:1em;
   color: #fff;
+  font-size: 10pt;
 }
 
 textarea {

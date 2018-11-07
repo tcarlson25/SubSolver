@@ -19,7 +19,7 @@ def decrypt():
         key, plaintext = solver.solve()
         print('here1')
         return json.dumps({'status':'OK', 'key': key, 'plaintext': plaintext})
-    elif methodOption == "2"
+    elif methodOption == "2":
         solver = None
         print('here2')
         return json.dumps({'status':'Fail'})
