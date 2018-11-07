@@ -12,7 +12,7 @@ body {
 	overflow-wrap: normal;
 }
 
-#cipherLabel, #methodLabel, #plainTextLabel, #possibleKeyLabel {
+#cipherLabel, #methodLabel, #plainTextLabel, #possibleKeyOrMapLabel {
 	color: #4CAF50;
 }
 
@@ -33,7 +33,7 @@ body {
   font-size: 10pt;
 }
 
-#possibleKey, #plaintextResult {
+#possibleKeyOrMap, #plaintextResult {
   color: white;
   font-size: 10pt;
 }
@@ -64,7 +64,7 @@ textarea {
     background-color: #45a049;
 }
 
-#plaintextResult, #possibleKey {
+#plaintextResult, #possibleKeyOrMap {
   color: #fff;
 }
 

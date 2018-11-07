@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, json
-from static.utils.solver import NgramSolver
+from static.utils.solver import NgramSolver, IntersectSolver
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -17,10 +17,11 @@ def decrypt():
     if methodOption == "1":
         solver = NgramSolver(ciphertextInput, 4)
         key, plaintext = solver.solve()
-        return json.dumps({'status':'OK', 'key': key, 'plaintext': plaintext})
+        return json.dumps({'status':'OK', 'key_mapping': key, 'plaintext': plaintext})
     elif methodOption == "2":
-        solver = None
-        return json.dumps({'status':'Fail'})
+        solver = IntersectSolver(ciphertextInput)
+        mapping, plaintext = solver.solve()
+        return json.dumps({'status':'OK', 'key_mapping': mapping, 'plaintext': plaintext})
     else:
         solver = None
         return json.dumps({'status':'Fail'})

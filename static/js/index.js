@@ -4,19 +4,32 @@ $(document).ready(function() {
 
   $('input:checkbox').click(function() {
       $('input:checkbox').not(this).prop('checked', false);
+      methodSelected = getMethodSelected()
+      if (methodSelected == "1") {
+        $("#possibleKeyOrMapLabel").text('Possible Key');
+      } else if (methodSelected == "2") {
+        $("#possibleKeyOrMapLabel").text('Found Mapping');
+      } else {
+        $("#possibleKeyOrMapLabel").text('Choose a Method');
+      }
   });
 
   $('#decryptButton').click(function(){
     $('#loader').show();
-    postData = {ciphertextInput: $('#ciphertext-input').val(), methodOption: getMethodSelected()};
+    var methodSelected = getMethodSelected();
+    postData = {ciphertextInput: $('#ciphertext-input').val(), methodOption: methodSelected};
   	$.ajax({
   		url: '/decrypt',
   		data: postData,
   		type: 'POST',
   		success: function(response){
-  			console.log(response);
+  			// console.log(response);
         responseJson = JSON.parse(response);
-        $("#possibleKey").text(responseJson.key);
+        if (methodSelected == "1") {
+          $("#possibleKeyOrMap").text(responseJson.key_mapping);
+        } else if (methodSelected == "2") {
+          $("#possibleKeyOrMap").text(JSON.stringify(responseJson.key_mapping));
+        }
         $("#plaintextResult").text(responseJson.plaintext);
         $('#loader').hide();
   		},
