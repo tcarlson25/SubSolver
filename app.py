@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, json
+from static.utils.solver import NgramSolver
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -11,8 +12,22 @@ def main():
 @app.route("/decrypt", methods=['POST'])
 def decrypt():
     ciphertextInput = request.form['ciphertextInput']
-    return json.dumps({'status':'OK', 'ciphertext-input': ciphertextInput})
-
+    methodOption = request.form['methodOption']
+    solver = None
+    if methodOption == "1":
+        solver = NgramSolver(ciphertextInput, 4)
+        key, plaintext = solver.solve()
+        print('here1')
+        return json.dumps({'status':'OK', 'key': key, 'plaintext': plaintext})
+    elif methodOption == "2"
+        solver = None
+        print('here2')
+        return json.dumps({'status':'Fail'})
+    else:
+        solver = None
+        print('here3')
+        return json.dumps({'status':'Fail'})
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    # app.run(host='0.0.0.0')
+    app.run()

@@ -9,13 +9,23 @@
 </head>
 
 <body>
+    <div id="loader" class="loading">Loading&#8230;</div>
 		<div>
 				<h1 id="title">
 						SubSolver
 				</h1>
 		</div>
-		<div class="container">
-				<label id="cipherLabel" for="ciphertext-input">Ciphertext</label>
+		<div class="cipher-container">
+        <label id="cipherLabel" for="ciphertext-input">Method</label>
+        <br/>
+        <br/>
+        <label id="method1Label" for="method1">Method 1</label>
+        <input id="method1Option" type="checkbox" class="check" value="1" />
+        <label id="method2Label" for="method2">Method 2</label>
+        <input id="method2Option" type="checkbox" class="check" value="1" />
+        <br/>
+        <br/>
+				<label id="methodLabel">Ciphertext</label>
 				<textarea id="ciphertext-input" rows="15" cols="100" placeholder="Enter Ciphertext to Decrypt..."></textarea>
 				<br/>
 				<button id="decryptButton">Decrypt</button>
@@ -23,7 +33,5 @@
 
 
 </body>
-
-
 
 </html>
