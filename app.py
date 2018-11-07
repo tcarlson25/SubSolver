@@ -15,13 +15,28 @@ def decrypt():
     methodOption = request.form['methodOption']
     solver = None
     if methodOption == "1":
+        solver = NgramSolver(ciphertextInput, 1)
+        key, plaintext = solver.solve()
+        return json.dumps({'key_mapping': key, 'plaintext': plaintext})
+    elif methodOption == "2":
+        solver = NgramSolver(ciphertextInput, 2)
+        key, plaintext = solver.solve()
+        return json.dumps({'key_mapping': key, 'plaintext': plaintext})
+    elif methodOption == "3":
+        solver = NgramSolver(ciphertextInput, 3)
+        key, plaintext = solver.solve()
+        return json.dumps({'key_mapping': key, 'plaintext': plaintext})
+    elif methodOption == "4":
         solver = NgramSolver(ciphertextInput, 4)
         key, plaintext = solver.solve()
-        return json.dumps({'status':'OK', 'key_mapping': key, 'plaintext': plaintext})
-    elif methodOption == "2":
+        return json.dumps({'key_mapping': key, 'plaintext': plaintext})
+    elif methodOption == "5":
         solver = IntersectSolver(ciphertextInput)
         mapping, plaintext = solver.solve()
-        return json.dumps({'status':'OK', 'key_mapping': mapping, 'plaintext': plaintext})
+        return json.dumps({'key_mapping': mapping, 'plaintext': plaintext})
+    elif methodOption == "6":
+        solver = None
+        return json.dumps({'status':'Fail'})
     else:
         solver = None
         return json.dumps({'status':'Fail'})
