@@ -1,39 +1,77 @@
-from static.utils.substitution import SubstitutionBreak
-from static.utils.transforms import Masker
-from static.utils.ngram import NgramScorer
+from static.utils.masker import Masker
+from static.utils.scorer import Scorer
 from static.utils.wordPatterns import WordPatterns
-from static.utils.simpleSubCipher import SimpleSubCipher
-import os
-import re, copy
+from static.utils.subCipher import SubCipher
+from pycipher import SimpleSubstitution
+import os, re, copy, random
 
 
 class NgramSolver(object):
     def __init__(self, ciphertext, gramNum):
         self.ciphertext = ciphertext
         self.gramNum = gramNum
+        self.candidates = []
+        random.seed(50)
         directory = dir = os.path.dirname(__file__)
-        ngram_files = {
+        ngramPaths = {
             1: directory + "/en/monograms.txt",
             2: directory + "/en/bigrams.txt",
             3: directory + "/en/trigrams.txt",
-            4: directory + "/en/quadgrams.txt",
+            4: directory + "/en/quadgrams.txt"
         }
-        self.ngramFiles = ngram_files
-
-    def load_ngrams(self):
+        self.ngramPaths = ngramPaths
         ngrams = {}
-        with open(self.ngramFiles[self.gramNum], "r") as f:
-            for line in f:
-                key, count = line.split(" ")
-                ngrams[key] = int(count)
-        return ngrams
+        ngramFile = open(self.ngramPaths[self.gramNum], "r")
+        for line in ngramFile:
+            key, value = line.split(" ")
+            ngrams[key] = int(value)
+        self.ngrams = ngrams
+
+    def guess(self, text, n=3):
+        result = []
+        for candidate in self.candidates[0:n]:
+            key, score = candidate
+            decryption = SimpleSubstitution(key).decipher(text)
+            result.append((decryption, score, key))
+        return result
+
+    def iterate(self, text, n):
+        for i in range(n):
+            key, score = self.getIteration(text)
+            self.candidates.append((key, score))
+            self.candidates = sorted(self.candidates, reverse=True,
+                                     key=lambda t: t[1])
+
+    # return score and the key used after one iteration
+    def getIteration(self, text):
+        key = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+        random.shuffle(key)
+        score = self.scorer.score(SimpleSubstitution(key).decipher(text))
+        count = 0
+        while count < 1000:
+            newKey = self.swap(key)
+            newScore = self.scorer.score(SimpleSubstitution(newKey).decipher(text))
+            if newScore > score:
+                key = newKey
+                score = newScore
+                count = 0
+            else:
+                count += 1
+        return key, score
+
+    # swap 2 random characters within the key
+    def swap(self, key):
+        a, b = random.randint(0, 25), random.randint(0, 25)
+        newKey = list(key)
+        newKey[a], newKey[b] = newKey[b], newKey[a]
+        return "".join(newKey)
 
     def solve(self):
-        ciphertext_break, masker = Masker.from_text(self.ciphertext)
-        scorer = NgramScorer(self.load_ngrams())
-        breaker = SubstitutionBreak(scorer, seed=50)
-        breaker.optimise(ciphertext_break, n=5)
-        decryption, score, key = breaker.guess(ciphertext_break)[0]
+        masker = Masker(self.ciphertext)
+        ciphertext_break = masker.getReducedText()
+        self.scorer = Scorer(self.ngrams)
+        self.iterate(ciphertext_break, 5)
+        decryption, score, key = self.guess(ciphertext_break)[0]
         return key, masker.extend(decryption)
 
 
@@ -45,22 +83,19 @@ class IntersectSolver(object):
         self.nonLettersOrSpacePattern = re.compile('[^A-Z\s]')
         self.ciphertext = ciphertext
 
-    def getBlankCipherletterMapping(self):
+    def getBlankMap(self):
         return {'A': [], 'B': [], 'C': [], 'D': [], 'E': [], 'F': [], 'G': [], \
         'H': [], 'I': [], 'J': [], 'K': [], 'L': [], 'M': [], 'N': [], 'O': [], \
         'P': [], 'Q': [], 'R': [], 'S': [], 'T': [], 'U': [], 'V': [], 'W': [], \
         'X': [], 'Y': [], 'Z': []}
 
-
-    def addLettersToMapping(self, letterMapping, cipherword, candidate):
+    def addToMapping(self, letterMapping, cipherword, candidate):
         for i in range(len(cipherword)):
             if candidate[i] not in letterMapping[cipherword[i]]:
                 letterMapping[cipherword[i]].append(candidate[i])
 
-
-
-    def intersectMappings(self, mapA, mapB):
-        intersectedMapping = self.getBlankCipherletterMapping()
+    def getMappingIntersection(self, mapA, mapB):
+        intersectedMapping = self.getBlankMap()
         for letter in self.letters:
             if mapA[letter] == []:
                 intersectedMapping[letter] = copy.deepcopy(mapB[letter])
@@ -71,7 +106,6 @@ class IntersectSolver(object):
                     if mappedLetter in mapB[letter]:
                         intersectedMapping[letter].append(mappedLetter)
         return intersectedMapping
-
 
     def removeSolvedLettersFromMapping(self, letterMapping):
         loopAgain = True
@@ -90,12 +124,11 @@ class IntersectSolver(object):
                             loopAgain = True
         return letterMapping
 
-
     def getLetterMappings(self, message):
-        intersectedMap = self.getBlankCipherletterMapping()
+        intersectedMap = self.getBlankMap()
         cipherwordList = self.nonLettersOrSpacePattern.sub('', message.upper()).split()
         for cipherword in cipherwordList:
-            candidateMap = self.getBlankCipherletterMapping()
+            candidateMap = self.getBlankMap()
 
             wordPattern = self.getWordPattern(cipherword)
             wordPatterns = WordPatterns()
@@ -105,11 +138,10 @@ class IntersectSolver(object):
 
             # Add the letters of each candidate to the mapping:
             for candidate in allPatterns[wordPattern]:
-                self.addLettersToMapping(candidateMap, cipherword, candidate)
-            intersectedMap = self.intersectMappings(intersectedMap, candidateMap)
+                self.addToMapping(candidateMap, cipherword, candidate)
+            intersectedMap = self.getMappingIntersection(intersectedMap, candidateMap)
 
         return self.removeSolvedLettersFromMapping(intersectedMap)
-
 
     def getWordPattern(self, word):
         word = word.upper()
@@ -124,8 +156,7 @@ class IntersectSolver(object):
             wordPattern.append(letterNums[letter])
         return '.'.join(wordPattern)
 
-
-    def decryptWithCipherletterMapping(self, ciphertext, letterMapping):
+    def decryptWithMapping(self, ciphertext, letterMapping):
         key = ['x'] * len(self.letters)
         for cipherletter in self.letters:
             if len(letterMapping[cipherletter]) == 1:
@@ -136,10 +167,10 @@ class IntersectSolver(object):
                 ciphertext = ciphertext.replace(cipherletter.lower(), '_')
                 ciphertext = ciphertext.replace(cipherletter.upper(), '_')
         key = ''.join(key)
-        subCipher = SimpleSubCipher()
+        subCipher = SubCipher()
         return subCipher.decryptMessage(key, ciphertext)
 
     def solve(self):
         letterMapping = self.getLetterMappings(self.ciphertext)
-        foundPlaintext = self.decryptWithCipherletterMapping(self.ciphertext, letterMapping)
+        foundPlaintext = self.decryptWithMapping(self.ciphertext, letterMapping)
         return letterMapping, foundPlaintext

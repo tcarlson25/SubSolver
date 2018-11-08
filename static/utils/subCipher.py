@@ -4,7 +4,7 @@
 import sys, random
 
 
-class SimpleSubCipher(object):
+class SubCipher(object):
     def __init__(self):
         self.letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
