@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, json
 from static.utils.solver import NgramSolver, IntersectSolver, FrequencySolver
 
 app = Flask(__name__)
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+# app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 @app.route("/")
 def main():
@@ -43,5 +43,5 @@ def decrypt():
         return json.dumps({'status':'Fail'})
 
 if __name__ == "__main__":
-    # app.run(host='0.0.0.0')
-    app.run()
+    app.run(host='0.0.0.0')
+    # app.run()
