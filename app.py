@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, json
-from static.utils.solver import NgramSolver, IntersectSolver
+from static.utils.solver import NgramSolver, IntersectSolver, FrequencySolver
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -35,8 +35,9 @@ def decrypt():
         mapping, plaintext = solver.solve()
         return json.dumps({'key_mapping': mapping, 'plaintext': plaintext})
     elif methodOption == "6":
-        solver = None
-        return json.dumps({'status':'Fail'})
+        solver = FrequencySolver(ciphertextInput)
+        mapping, plaintext = solver.solve()
+        return json.dumps({'key_mapping': mapping, 'plaintext': plaintext})
     else:
         solver = None
         return json.dumps({'status':'Fail'})

@@ -3,6 +3,8 @@ from static.utils.transforms import Masker
 from static.utils.ngram import NgramScorer
 from static.utils.wordPatterns import WordPatterns
 from static.utils.simpleSubCipher import SimpleSubCipher
+from nltk.corpus import wordnet
+import itertools
 import os
 import re, copy
 
@@ -143,3 +145,95 @@ class IntersectSolver(object):
         letterMapping = self.getLetterMappings(self.ciphertext)
         foundPlaintext = self.decryptWithCipherletterMapping(self.ciphertext, letterMapping)
         return letterMapping, foundPlaintext
+
+
+class FrequencySolver(object):
+    def __init__(self, ciphertext):
+        self.letterFrequency = {'E': 12.70, 'T': 9.06, 'A': 8.17, 'O': 7.51, 'I': 6.97, 'N': 6.75, 'S': 6.33, 'H': 6.09, 'R': 5.99, 'D': 4.25, 'L': 4.03, 'C': 2.78, 'U': 2.76, 'M': 2.41, 'W': 2.36, 'F': 2.23, 'G': 2.02, 'Y': 1.97, 'P': 1.93, 'B': 1.29, 'V': 0.98, 'K': 0.77, 'J': 0.15, 'X': 0.15, 'Q': 0.10, 'Z': 0.07}
+        self.letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        self.normalDict = "ETAOINSHRDLCUMWFGYPBVKJXQZ"
+        self.nonLettersOrSpacePattern = re.compile('[^A-Z\s]')
+        self.ciphertext = ciphertext
+        self.cipherWords = ciphertext.split()
+        self.mDict = dict()
+
+    def Scorer(self, wordList):
+        score = 0
+        for word in wordList:
+            if not wordnet.synsets(word):
+                #Not an English Word
+                score -= 1
+            else:
+                #English Word
+                score += 1
+        return score
+
+    def GetCipherDistribution(self, cipher):
+        cipher = cipher.upper()
+        lettDict = dict()
+        countDict = dict()
+
+        for letter in self.letters:
+            lettCount = cipher.count(letter)
+            countDict[lettCount] = list()
+
+        for letter in self.letters:
+            lettCount = cipher.count(letter)
+            lettDict[letter] = lettCount
+            countDict[lettCount].append(letter)
+
+        countList = sorted(countDict.keys(),reverse = True)
+        returnDict = dict()
+        for k in countList:
+            returnDict[k] = list()
+            returnDict[k].extend(countDict[k])
+
+        return dict(sorted(lettDict.items(), key=lambda kv: kv[1], reverse=True)), returnDict
+
+    def SolveKeys(self, str, index, wList):
+        if index == len(wList):
+            if(len(str) == 26):
+                self.mDict[str] = 1
+            return str
+        else:
+            permList = list(itertools.permutations(wList[index]))
+            for p in permList:
+                cpy_str = str
+                for j in range(len(p)):
+                    cpy_str += p[j]
+                self.SolveKeys(cpy_str, index + 1, wList)
+
+    def translator(self, text,alphabet,key):
+        trantab = str.maketrans(alphabet,key)
+        result = text.translate(trantab)
+        return result
+
+    def decrypt(self, cipherText, keys):
+        plainWordList = list()
+        for i in range(len(keys)):
+            k = keys[i]
+            pword = self.translator(cipherText, k, self.normalDict)
+            plainWordList.append(pword)
+        return plainWordList
+
+    def GetScores(self, answers):
+        best_score = -9999
+        index = -1
+        for ans in range(len(answers)):
+            ansWords = answers[ans].split()
+            scr = self.Scorer(ansWords)
+            if scr > best_score:
+                best_score = scr
+                index = ans
+        return best_score, index
+        
+    def solve(self):
+        distList, countDict = self.GetCipherDistribution(self.ciphertext)
+        print(distList)
+        wList = list(countDict.values())
+        self.SolveKeys("", 0, wList)
+        keySet = set(list(self.mDict.keys()))
+        print("Keys: ", len(keySet) )
+        setAnswers = list(set(self.decrypt(self.ciphertext, list(self.mDict.keys()))))
+        score, index = self.GetScores(setAnswers)
+        return list(keySet)[index], setAnswers[index]
