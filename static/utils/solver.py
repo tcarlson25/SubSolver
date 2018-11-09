@@ -4,6 +4,8 @@ from static.utils.wordPatterns import WordPatterns
 from static.utils.subCipher import SubCipher
 from pycipher import SimpleSubstitution
 import os, re, copy, random
+from itertools import permutations
+from nltk.corpus import wordnet
 
 
 class NgramSolver(object):
@@ -225,7 +227,7 @@ class FrequencySolver(object):
                 self.mDict[str] = 1
             return str
         else:
-            permList = list(itertools.permutations(wList[index]))
+            permList = list(permutations(wList[index]))
             for p in permList:
                 cpy_str = str
                 for j in range(len(p)):
@@ -255,7 +257,7 @@ class FrequencySolver(object):
                 best_score = scr
                 index = ans
         return best_score, index
-        
+
     def solve(self):
         distList, countDict = self.GetCipherDistribution(self.ciphertext)
         print(distList)
