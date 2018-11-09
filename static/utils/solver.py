@@ -9,8 +9,7 @@ from nltk.corpus import wordnet
 
 
 class NgramSolver(object):
-    def __init__(self, ciphertext, gramNum):
-        self.ciphertext = ciphertext
+    def __init__(self, gramNum):
         self.gramNum = gramNum
         self.candidates = []
         random.seed(50)
@@ -68,8 +67,8 @@ class NgramSolver(object):
         newKey[a], newKey[b] = newKey[b], newKey[a]
         return "".join(newKey)
 
-    def solve(self):
-        masker = Masker(self.ciphertext)
+    def solve(self, ciphertext):
+        masker = Masker(ciphertext)
         ciphertext_break = masker.getReducedText()
         self.scorer = Scorer(self.ngrams)
         self.iterate(ciphertext_break, 5)
@@ -80,10 +79,9 @@ class NgramSolver(object):
 
 
 class IntersectSolver(object):
-    def __init__(self, ciphertext):
+    def __init__(self):
         self.letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         self.nonLettersOrSpacePattern = re.compile('[^A-Z\s]')
-        self.ciphertext = ciphertext
 
     def getBlankMap(self):
         return {'A': [], 'B': [], 'C': [], 'D': [], 'E': [], 'F': [], 'G': [], \
@@ -172,20 +170,18 @@ class IntersectSolver(object):
         subCipher = SubCipher()
         return subCipher.decryptMessage(key, ciphertext)
 
-    def solve(self):
-        letterMapping = self.getLetterMappings(self.ciphertext)
-        foundPlaintext = self.decryptWithMapping(self.ciphertext, letterMapping)
+    def solve(self, ciphertext):
+        letterMapping = self.getLetterMappings(ciphertext)
+        foundPlaintext = self.decryptWithMapping(ciphertext, letterMapping)
         return letterMapping, foundPlaintext
 
 
 class FrequencySolver(object):
-    def __init__(self, ciphertext):
+    def __init__(self):
         self.letterFrequency = {'E': 12.70, 'T': 9.06, 'A': 8.17, 'O': 7.51, 'I': 6.97, 'N': 6.75, 'S': 6.33, 'H': 6.09, 'R': 5.99, 'D': 4.25, 'L': 4.03, 'C': 2.78, 'U': 2.76, 'M': 2.41, 'W': 2.36, 'F': 2.23, 'G': 2.02, 'Y': 1.97, 'P': 1.93, 'B': 1.29, 'V': 0.98, 'K': 0.77, 'J': 0.15, 'X': 0.15, 'Q': 0.10, 'Z': 0.07}
         self.letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
         self.normalDict = "ETAOINSHRDLCUMWFGYPBVKJXQZ"
         self.nonLettersOrSpacePattern = re.compile('[^A-Z\s]')
-        self.ciphertext = ciphertext
-        self.cipherWords = ciphertext.split()
         self.mDict = dict()
 
     def Scorer(self, wordList):
@@ -258,13 +254,14 @@ class FrequencySolver(object):
                 index = ans
         return best_score, index
 
-    def solve(self):
-        distList, countDict = self.GetCipherDistribution(self.ciphertext)
+    def solve(self, ciphertext):
+        self.cipherWords = ciphertext.split()
+        distList, countDict = self.GetCipherDistribution(ciphertext)
         print(distList)
         wList = list(countDict.values())
         self.SolveKeys("", 0, wList)
         keySet = set(list(self.mDict.keys()))
         print("Keys: ", len(keySet) )
-        setAnswers = list(set(self.decrypt(self.ciphertext, list(self.mDict.keys()))))
+        setAnswers = list(set(self.decrypt(ciphertext, list(self.mDict.keys()))))
         score, index = self.GetScores(setAnswers)
         return list(keySet)[index], setAnswers[index]

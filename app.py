@@ -4,6 +4,14 @@ from static.utils.solver import NgramSolver, IntersectSolver, FrequencySolver
 app = Flask(__name__)
 # app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
+monogramSolver = NgramSolver(1)
+bigramSolver = NgramSolver(2)
+trigramSolver = NgramSolver(3)
+quadgramSolver = NgramSolver(4)
+intersectSolver = IntersectSolver()
+frequencySolver = FrequencySolver()
+
+
 @app.route("/")
 def main():
     return render_template('index.html')
@@ -15,31 +23,24 @@ def decrypt():
     methodOption = request.form['methodOption']
     solver = None
     if methodOption == "1":
-        solver = NgramSolver(ciphertextInput, 1)
-        key, plaintext = solver.solve()
+        key, plaintext = monogramSolver.solve(ciphertextInput)
         return json.dumps({'key_mapping': key, 'plaintext': plaintext})
     elif methodOption == "2":
-        solver = NgramSolver(ciphertextInput, 2)
-        key, plaintext = solver.solve()
+        key, plaintext = bigramSolver.solve(ciphertextInput)
         return json.dumps({'key_mapping': key, 'plaintext': plaintext})
     elif methodOption == "3":
-        solver = NgramSolver(ciphertextInput, 3)
-        key, plaintext = solver.solve()
+        key, plaintext = trigramSolver.solve(ciphertextInput)
         return json.dumps({'key_mapping': key, 'plaintext': plaintext})
     elif methodOption == "4":
-        solver = NgramSolver(ciphertextInput, 4)
-        key, plaintext = solver.solve()
+        key, plaintext = quadgramSolver.solve(ciphertextInput)
         return json.dumps({'key_mapping': key, 'plaintext': plaintext})
     elif methodOption == "5":
-        solver = IntersectSolver(ciphertextInput)
-        mapping, plaintext = solver.solve()
+        mapping, plaintext = intersectSolver.solve(ciphertextInput)
         return json.dumps({'key_mapping': mapping, 'plaintext': plaintext})
     elif methodOption == "6":
-        solver = FrequencySolver(ciphertextInput)
-        mapping, plaintext = solver.solve()
-        return json.dumps({'key_mapping': mapping, 'plaintext': plaintext})
+        key, plaintext = frequencySolver.solve(ciphertextInput)
+        return json.dumps({'key_mapping': key, 'plaintext': plaintext})
     else:
-        solver = None
         return json.dumps({'status':'Fail'})
 
 if __name__ == "__main__":
