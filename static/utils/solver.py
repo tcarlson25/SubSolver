@@ -5,6 +5,8 @@ from static.utils.subCipher import SubCipher
 from pycipher import SimpleSubstitution
 import os, re, copy, random
 from itertools import permutations
+import nltk
+nltk.download('wordnet')
 from nltk.corpus import wordnet
 
 
