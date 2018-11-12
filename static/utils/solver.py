@@ -241,7 +241,8 @@ class FrequencySolver(object):
         plainWordList = list()
         for i in range(len(keys)):
             k = keys[i]
-            pword = self.translator(cipherText, k, self.normalDict)
+            # pword = self.translator(cipherText, k, self.normalDict)
+            pword = SimpleSubstitution(k).decipher(cipherText)
             plainWordList.append(pword)
         return plainWordList
 
@@ -266,4 +267,6 @@ class FrequencySolver(object):
         print("Keys: ", len(keySet) )
         setAnswers = list(set(self.decrypt(ciphertext, list(self.mDict.keys()))))
         score, index = self.GetScores(setAnswers)
-        return list(keySet)[index], setAnswers[index]
+        # return list(keySet)[index], setAnswers[index]
+        masker = Masker(ciphertext)
+        return list(keySet)[index], masker.extend(setAnswers[index])
