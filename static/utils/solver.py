@@ -6,6 +6,9 @@ from pycipher import SimpleSubstitution
 import os, re, copy, random
 from itertools import permutations
 import nltk
+import plotly
+import plotly.graph_objs as go
+plotly.tools.set_credentials_file(username='subsolver', api_key='HiUsV5UmzAHrV6K1aus2')
 nltk.download('wordnet')
 from nltk.corpus import wordnet
 
@@ -261,6 +264,24 @@ class FrequencySolver(object):
         self.cipherWords = ciphertext.split()
         distList, countDict = self.GetCipherDistribution(ciphertext)
         print(distList)
+        graphX = list(distList.keys())
+        graphY = list(distList.values())
+        data = [go.Bar(
+            dict(
+                {"x" : graphX, "y" : graphY}
+            )
+        )]
+        layout = go.Layout(
+            title='Frequency Distribution',
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)', 
+            font=dict(color='#FFFFFF')
+        )
+        
+        #plotly.offline.plot(data, filename='basic-bar')
+        figure=go.Figure(data=data,layout=layout)
+        div = plotly.offline.plot(figure, show_link=False, output_type="div", include_plotlyjs=False)
+        
         wList = list(countDict.values())
         self.SolveKeys("", 0, wList)
         keySet = set(list(self.mDict.keys()))
@@ -269,4 +290,4 @@ class FrequencySolver(object):
         score, index = self.GetScores(setAnswers)
         # return list(keySet)[index], setAnswers[index]
         masker = Masker(ciphertext)
-        return list(keySet)[index], masker.extend(setAnswers[index])
+        return list(keySet)[index], masker.extend(setAnswers[index]), div

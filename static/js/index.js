@@ -30,6 +30,15 @@ $(document).ready(function() {
         $('#loader').hide();
         if (methodSelected == "0") {
           alert('Please Choose a Method');
+        } else if (methodSelected == "6") {
+          mappings = responseJson.key_mapping;
+          div = responseJson.barData;
+          mappingsStr = responseJson.key_mapping;
+          $("#possibleKeyOrMap").html(mappingsStr);
+          $("#plaintextResult").text(responseJson.plaintext);
+          $('#barGraph').html(div);
+          console.log(div);
+
         } else if (methodSelected != "5") {
           $("#possibleKeyOrMap").text(responseJson.key_mapping);
           $("#plaintextResult").text(responseJson.plaintext);

@@ -38,8 +38,9 @@ def decrypt():
         mapping, plaintext = intersectSolver.solve(ciphertextInput)
         return json.dumps({'key_mapping': mapping, 'plaintext': plaintext})
     elif methodOption == "6":
-        key, plaintext = frequencySolver.solve(ciphertextInput)
-        return json.dumps({'key_mapping': key, 'plaintext': plaintext})
+        key, plaintext, divData = frequencySolver.solve(ciphertextInput)
+        print(divData)
+        return json.dumps({'key_mapping': key, 'plaintext': plaintext, 'barData': divData})
     else:
         return json.dumps({'status':'Fail'})
 
