@@ -37,20 +37,22 @@ $(document).ready(function() {
           $("#possibleKeyOrMap").html(mappingsStr);
           $("#plaintextResult").text(responseJson.plaintext);
           $('#barGraph').html(div);
-          console.log(div);
 
         } else if (methodSelected != "5") {
           $("#possibleKeyOrMap").text(responseJson.key_mapping);
           $("#plaintextResult").text(responseJson.plaintext);
+          $('#barGraph').html('');
         } else {
           mappings = responseJson.key_mapping;
+          div = responseJson.tableData;
           mappingsStr = ""
           for (var mapping in mappings) {
             console.log(mapping + ":" + mappings[mapping]);
             mappingsStr += mapping + "  -->  [" + mappings[mapping] + "]<br />";
           }
-          $("#possibleKeyOrMap").html(mappingsStr);
           $("#plaintextResult").text(responseJson.plaintext);
+          $('#barGraph').html('');
+          $('#barGraph').html(div);
         }
   		},
   		error: function(error){

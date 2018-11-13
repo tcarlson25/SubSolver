@@ -35,8 +35,8 @@ def decrypt():
         key, plaintext = quadgramSolver.solve(ciphertextInput)
         return json.dumps({'key_mapping': key, 'plaintext': plaintext})
     elif methodOption == "5":
-        mapping, plaintext = intersectSolver.solve(ciphertextInput)
-        return json.dumps({'key_mapping': mapping, 'plaintext': plaintext})
+        mapping, plaintext,divData = intersectSolver.solve(ciphertextInput)
+        return json.dumps({'key_mapping': mapping, 'plaintext': plaintext, 'tableData' : divData})
     elif methodOption == "6":
         key, plaintext, divData = frequencySolver.solve(ciphertextInput)
         print(divData)

@@ -178,7 +178,29 @@ class IntersectSolver(object):
     def solve(self, ciphertext):
         letterMapping = self.getLetterMappings(ciphertext)
         foundPlaintext = self.decryptWithMapping(ciphertext, letterMapping)
-        return letterMapping, foundPlaintext
+        listKeys = list(letterMapping.keys())
+        listValues = list(letterMapping.values())
+        trace = [go.Table(
+            header=dict(values=['Letter', 'Possible\nReplacements'],
+                            line = dict(color='#7D7F80'),
+                            fill = dict(color='#a1c3d1'),
+                            align = ['left'] * 5),
+            cells=dict(values=[listKeys,
+                            listValues],
+                            line = dict(color='#7D7F80'),
+                            fill = dict(color='rgba(0,0,0,0)'),
+                            align = ['left'] * 5))]
+        layout = go.Layout(
+            width=600, height=750,
+            title='Possible Mappings',
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)', 
+            font=dict(color='#FFFFFF')
+        )
+        figure=go.Figure(data=trace,layout=layout)
+        div = plotly.offline.plot(figure, show_link=False, output_type="div", include_plotlyjs=False)
+
+        return letterMapping, foundPlaintext, div
 
 
 class FrequencySolver(object):
