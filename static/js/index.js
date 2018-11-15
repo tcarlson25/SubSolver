@@ -66,6 +66,7 @@ $(document).ready(function() {
 function resetResults() {
   $("#possibleKeyOrMap").html('');
   $("#plaintextResult").html('');
+  $('#barGraph').html('');
 }
 
 function getMethodSelected() {
