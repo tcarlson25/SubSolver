@@ -28,7 +28,7 @@ body {
 }
 
 #method2Label, #method3Label, #method4Label, #method5Label,
-#method6Label, #method7Label, #method8Label {
+#method6Label, #method7Label, #method8Label, #randomKeyLabel {
   padding-left:1em;
   color: #fff;
   font-size: 10pt;

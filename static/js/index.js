@@ -3,9 +3,20 @@ $(document).ready(function() {
   $('#loader').hide();
   $("#plainTextLabel").hide();
   $('#key-input').hide();
+  $('#randomKeyLabel').hide();
+  $('#randomKeyOption').hide();
 
-  $('input:checkbox').click(function() {
-      $('input:checkbox').not(this).prop('checked', false);
+  $('#randomKeyOption').click(function() {
+    var isRandom = $('#randomKeyOption').prop('checked');
+    if (isRandom) {
+      $('#key-input').val(generateRandomKey());
+    } else {
+      $('#key-input').val('');
+    }
+  });
+
+  $('.main').click(function() {
+      $('.main').not(this).prop('checked', false);
       methodSelected = getMethodSelected()
       if (methodSelected == "0") {
         // no method selected
@@ -15,6 +26,8 @@ $(document).ready(function() {
         $("#plainTextLabel").hide();
         $('#key-input').hide();
         $("#decryptButton").text("Decrypt");
+        $('#randomKeyLabel').hide();
+        $('#randomKeyOption').hide();
         resetResults();
       } else if (methodSelected == "7") {
         // manual
@@ -26,6 +39,8 @@ $(document).ready(function() {
         $("#plainTextLabel").text("Plaintext");
         $("#plainTextLabel").show();
         $("#decryptButton").text("Decrypt");
+        $('#randomKeyLabel').hide();
+        $('#randomKeyOption').hide();
         resetResults();
       } else if (methodSelected == "8") {
         // encrypt
@@ -37,6 +52,8 @@ $(document).ready(function() {
         $("#possibleKeyOrMapLabel").text('Key');
         $("#plainTextLabel").text("Ciphertext");
         $("#decryptButton").text("Encrypt");
+        $('#randomKeyLabel').show();
+        $('#randomKeyOption').show();
       } else if (methodSelected != "5") {
         // ngrams
         $('#ciphertext-input').attr('placeholder', 'Enter Ciphertext to Decrypt...');
@@ -46,6 +63,8 @@ $(document).ready(function() {
         $("#plainTextLabel").text("Plaintext");
         $("#plainTextLabel").show();
         $("#decryptButton").text("Decrypt");
+        $('#randomKeyLabel').hide();
+        $('#randomKeyOption').hide();
         resetResults();
       } else {
         // intersection
@@ -55,6 +74,8 @@ $(document).ready(function() {
         $("#possibleKeyOrMapLabel").text('Found Mapping');
         $("#plainTextLabel").text("Plaintext");
         $("#plainTextLabel").show();
+        $('#randomKeyLabel').hide();
+        $('#randomKeyOption').hide();
         resetResults();
       }
   });
@@ -117,6 +138,15 @@ function resetResults() {
   $("#possibleKeyOrMap").html('');
   $("#plaintextResult").html('');
   $('#barGraph').html('');
+}
+
+function generateRandomKey() {
+  var letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  return letters.split('').sort(randomsort).join('');
+}
+
+function randomsort(a, b) {
+	return Math.random()>.5 ? -1 : 1;
 }
 
 function getMethodSelected() {
