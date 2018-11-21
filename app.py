@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, json
-from static.utils.solver import NgramSolver, IntersectSolver, FrequencySolver
+from static.utils.solver import NgramSolver, IntersectSolver, FrequencySolver, ManualSolver
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -12,6 +12,7 @@ trigramSolver = NgramSolver(3)
 quadgramSolver = NgramSolver(4)
 intersectSolver = IntersectSolver()
 frequencySolver = FrequencySolver()
+manualSolver = ManualSolver()
 
 
 @app.route("/")
@@ -23,6 +24,7 @@ def main():
 def decrypt():
     ciphertextInput = request.form['ciphertextInput']
     methodOption = request.form['methodOption']
+    keyInput = request.form['keyInput']
     solver = None
     if methodOption == "1":
         key, plaintext = monogramSolver.solve(ciphertextInput)
@@ -41,8 +43,13 @@ def decrypt():
         return json.dumps({'key_mapping': mapping, 'plaintext': plaintext, 'tableData' : divData})
     elif methodOption == "6":
         key, plaintext, divData = frequencySolver.solve(ciphertextInput)
-        print(divData)
         return json.dumps({'key_mapping': key, 'plaintext': plaintext, 'barData': divData})
+    elif methodOption == "7":
+        plaintext = manualSolver.decrypt(keyInput, ciphertextInput)
+        return json.dumps({'plaintext': plaintext})
+    elif methodOption == "8":
+        ciphertext = manualSolver.encrypt(keyInput, ciphertextInput)
+        return json.dumps({'ciphertext': ciphertext})
     else:
         return json.dumps({'status':'Fail'})
 

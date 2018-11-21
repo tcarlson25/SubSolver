@@ -27,7 +27,8 @@ body {
   font-size: 10pt;
 }
 
-#method2Label, #method3Label, #method4Label, #method5Label, #method6Label {
+#method2Label, #method3Label, #method4Label, #method5Label,
+#method6Label, #method7Label, #method8Label {
   padding-left:1em;
   color: #fff;
   font-size: 10pt;

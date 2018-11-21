@@ -194,7 +194,7 @@ class IntersectSolver(object):
             width=600, height=750,
             title='Possible Mappings',
             paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)', 
+            plot_bgcolor='rgba(0,0,0,0)',
             font=dict(color='#FFFFFF')
         )
         figure=go.Figure(data=trace,layout=layout)
@@ -296,14 +296,14 @@ class FrequencySolver(object):
         layout = go.Layout(
             title='Frequency Distribution',
             paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)', 
+            plot_bgcolor='rgba(0,0,0,0)',
             font=dict(color='#FFFFFF')
         )
-        
+
         #plotly.offline.plot(data, filename='basic-bar')
         figure=go.Figure(data=data,layout=layout)
         div = plotly.offline.plot(figure, show_link=False, output_type="div", include_plotlyjs=False)
-        
+
         wList = list(countDict.values())
         self.SolveKeys("", 0, wList)
         keySet = set(list(self.mDict.keys()))
@@ -313,3 +313,16 @@ class FrequencySolver(object):
         # return list(keySet)[index], setAnswers[index]
         masker = Masker(ciphertext)
         return list(keySet)[index], masker.extend(setAnswers[index]), div
+
+
+class ManualSolver(object):
+
+    def decrypt(self, key, ciphertext):
+        masker = Masker(ciphertext)
+        plaintext = SimpleSubstitution(key).decipher(ciphertext)
+        return masker.extend(plaintext)
+
+    def encrypt(self, key, plaintext):
+        masker = Masker(plaintext)
+        ciphertext = SimpleSubstitution(key).encipher(plaintext)
+        return masker.extend(ciphertext)
