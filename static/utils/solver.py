@@ -237,39 +237,50 @@ class FrequencySolver(object):
             countDict[lettCount].append(letter)
 
         countList = sorted(countDict.keys(),reverse = True)
-        returnDict = dict()
+        freqToLetter = dict()
         for k in countList:
-            returnDict[k] = list()
-            returnDict[k].extend(countDict[k])
+            freqToLetter[k] = list()
+            freqToLetter[k].extend(countDict[k])
 
-        return dict(sorted(lettDict.items(), key=lambda kv: kv[1], reverse=True)), returnDict
+        letterToFreq = dict(sorted(lettDict.items(), key=lambda kv: kv[1], reverse=True))
+        return letterToFreq, freqToLetter
 
-    def SolveKeys(self, str, index, wList):
-        if index == len(wList):
+    def SolveKeys(self, str, index, frequentLetterList):
+        if index == len(frequentLetterList):
             if(len(str) == 26):
-                self.mDict[str] = 1
-            return str
+                mapping = self.getMapping(str)
+                key = self.convertMappingToKey(mapping)
+                self.mDict[key] = 1
+            return key
         else:
-            permList = list(permutations(wList[index]))
+            permList = list(permutations(frequentLetterList[index]))
             for p in permList:
                 cpy_str = str
                 for j in range(len(p)):
                     cpy_str += p[j]
-                self.SolveKeys(cpy_str, index + 1, wList)
-
-    def translator(self, text,alphabet,key):
-        trantab = str.maketrans(alphabet,key)
-        result = text.translate(trantab)
-        return result
+                self.SolveKeys(cpy_str, index + 1, frequentLetterList)
 
     def decrypt(self, cipherText, keys):
         plainWordList = list()
         for i in range(len(keys)):
             k = keys[i]
-            # pword = self.translator(cipherText, k, self.normalDict)
             pword = SimpleSubstitution(k).decipher(cipherText)
             plainWordList.append(pword)
         return plainWordList
+
+    def convertMappingToKey(self, letterMapping):
+        key = ['x'] * len(self.letters)
+        for cipherletter in self.letters:
+            keyIndex = self.letters.find(letterMapping[cipherletter])
+            key[keyIndex] = cipherletter
+        key = ''.join(key)
+        return key
+
+    def getMapping(self, subKey):
+        freqOrderList = list(subKey)
+        etaoinList = list(self.normalDict)
+        mappings = dict(zip(freqOrderList, etaoinList))
+        return mappings
 
     def GetScores(self, answers):
         best_score = -9999
@@ -284,10 +295,9 @@ class FrequencySolver(object):
 
     def solve(self, ciphertext):
         self.cipherWords = ciphertext.split()
-        distList, countDict = self.GetCipherDistribution(ciphertext)
-        print(distList)
-        graphX = list(distList.keys())
-        graphY = list(distList.values())
+        letterToFreq, freqToLetter = self.GetCipherDistribution(ciphertext)
+        graphX = list(letterToFreq.keys())
+        graphY = list(letterToFreq.values())
         data = [go.Bar(
             dict(
                 {"x" : graphX, "y" : graphY}
@@ -304,16 +314,14 @@ class FrequencySolver(object):
         figure=go.Figure(data=data,layout=layout)
         div = plotly.offline.plot(figure, show_link=False, output_type="div", include_plotlyjs=False)
 
-        wList = list(countDict.values())
-        self.SolveKeys("", 0, wList)
+        frequentLetterList = list(freqToLetter.values())
+        self.SolveKeys("", 0, frequentLetterList)
         keySet = set(list(self.mDict.keys()))
         print("Keys: ", len(keySet) )
         setAnswers = list(set(self.decrypt(ciphertext, list(self.mDict.keys()))))
         score, index = self.GetScores(setAnswers)
-        # return list(keySet)[index], setAnswers[index]
         masker = Masker(ciphertext)
         return list(keySet)[index], masker.extend(setAnswers[index]), div
-
 
 class ManualSolver(object):
 
@@ -326,3 +334,17 @@ class ManualSolver(object):
         masker = Masker(plaintext)
         ciphertext = SimpleSubstitution(key).encipher(plaintext)
         return masker.extend(ciphertext)
+
+class SuccessFinder(object):
+
+    def getSuccess(self, resultText, plaintext):
+        score = 0
+        total = 0
+        for index, cipherLetter in enumerate(resultText):
+            plaintextLetter = plaintext[index]
+            if plaintextLetter == ' ':
+                continue
+            elif plaintextLetter == cipherLetter:
+                score += 1
+            total += 1
+        return (score/total)*100
