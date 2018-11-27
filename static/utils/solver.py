@@ -16,8 +16,6 @@ from nltk.corpus import wordnet
 class NgramSolver(object):
     def __init__(self, gramNum):
         self.gramNum = gramNum
-        self.candidates = []
-        random.seed(50)
         directory = dir = os.path.dirname(__file__)
         ngramPaths = {
             1: directory + "/en/monograms.txt",
@@ -32,6 +30,7 @@ class NgramSolver(object):
             key, value = line.split(" ")
             ngrams[key] = int(value)
         self.ngrams = ngrams
+        self.scorer = Scorer(self.ngrams)
 
     def guess(self, text, n=3):
         result = []
@@ -73,9 +72,10 @@ class NgramSolver(object):
         return "".join(newKey)
 
     def solve(self, ciphertext):
+        self.candidates = []
+        random.seed(50)
         masker = Masker(ciphertext)
         ciphertext_break = masker.getReducedText()
-        self.scorer = Scorer(self.ngrams)
         self.iterate(ciphertext_break, 5)
         decryption, score, key = self.guess(ciphertext_break)[0]
         return key, masker.extend(decryption)
@@ -334,17 +334,3 @@ class ManualSolver(object):
         masker = Masker(plaintext)
         ciphertext = SimpleSubstitution(key).encipher(plaintext)
         return masker.extend(ciphertext)
-
-class SuccessFinder(object):
-
-    def getSuccess(self, resultText, plaintext):
-        score = 0
-        total = 0
-        for index, cipherLetter in enumerate(resultText):
-            plaintextLetter = plaintext[index]
-            if plaintextLetter == ' ':
-                continue
-            elif plaintextLetter == cipherLetter:
-                score += 1
-            total += 1
-        return (score/total)*100

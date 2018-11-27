@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, json
-from static.utils.solver import NgramSolver, IntersectSolver, FrequencySolver, ManualSolver, SuccessFinder
+from static.utils.solver import NgramSolver, IntersectSolver, FrequencySolver, ManualSolver
 
 app = Flask(__name__)
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
@@ -43,9 +43,6 @@ def decrypt():
         return json.dumps({'key_mapping': mapping, 'plaintext': plaintext, 'tableData' : divData})
     elif methodOption == "6":
         key, plaintext, divData = frequencySolver.solve(ciphertextInput)
-        successFinder = SuccessFinder()
-        hardPlain =  "The simple substitution cipher is quite easy to break. Even though the number of keys is around 288.4 (a really big number), there is a lot of redundancy and other statistical properties of english text that make it quite easy to determine a reasonably good key. The first step is to calculate the frequency distribution of the letters in the cipher text. This consists of counting how many times each letter appears. Natural english text has a very distinct distribution that can be used help crack codes."
-        print(successFinder.getSuccess(plaintext, hardPlain))
         return json.dumps({'key_mapping': key, 'plaintext': plaintext, 'barData': divData})
     elif methodOption == "7":
         plaintext = manualSolver.decrypt(keyInput, ciphertextInput)
