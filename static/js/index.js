@@ -54,6 +54,7 @@ $(document).ready(function() {
         $("#decryptButton").text("Encrypt");
         $('#randomKeyLabel').show();
         $('#randomKeyOption').show();
+        resetResults();
       } else if (methodSelected != "5") {
         // ngrams
         $('#ciphertext-input').attr('placeholder', 'Enter Ciphertext to Decrypt...');
