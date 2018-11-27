@@ -2,9 +2,9 @@ from flask import Flask, render_template, request, json
 from static.utils.solver import NgramSolver, IntersectSolver, FrequencySolver, ManualSolver
 
 app = Flask(__name__)
-# app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-# app.config['TEMPLATES_AUTO_RELOAD'] = True
-# app.config['SECRET_KEY'] = 'secret_key'
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.config['SECRET_KEY'] = 'secret_key'
 
 monogramSolver = NgramSolver(1)
 bigramSolver = NgramSolver(2)
@@ -54,5 +54,5 @@ def decrypt():
         return json.dumps({'status':'Fail'})
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
-    # app.run(debug=True);
+    # app.run(host='0.0.0.0')
+    app.run(debug=True);
